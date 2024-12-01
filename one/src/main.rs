@@ -1,7 +1,10 @@
 use std::{collections::HashMap, error::Error, fs::read_to_string};
 
 /// part one
-fn get_diff(list_one: &mut Vec<isize>, list_two: &mut Vec<isize>) -> Result<isize, Box<dyn Error>> {
+fn get_difference(
+    list_one: &mut Vec<isize>,
+    list_two: &mut Vec<isize>,
+) -> Result<isize, Box<dyn Error>> {
     list_one.sort();
     list_two.sort();
 
@@ -21,8 +24,6 @@ fn get_similarity(
     list_one: &mut Vec<isize>,
     list_two: &mut Vec<isize>,
 ) -> Result<isize, Box<dyn Error>> {
-    list_two.sort();
-
     let mut scores = HashMap::new();
     for num in list_two.iter() {
         if !scores.contains_key(num) {
@@ -63,7 +64,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         list_one.push(lists.pop().unwrap());
     }
 
-    let diff = get_diff(&mut list_one, &mut list_two);
+    let diff = get_difference(&mut list_one, &mut list_two);
     println!("part 1 - accumulated distance\n     {}", diff.unwrap());
 
     let sim = get_similarity(&mut list_one, &mut list_two).unwrap();
