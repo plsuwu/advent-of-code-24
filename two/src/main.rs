@@ -48,10 +48,9 @@ fn get_safe_reports(reports: Lines<'_>) -> Result<isize, Box<dyn Error>> {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let input = fs::read_to_string("./src/input.txt")?;
-
     let reports = input.lines();
 
-    let safe = get_safe_reports(reports).unwrap();
+    let safe = get_safe_reports(reports)?;
     println!("safe lines:\n    {}", safe);
 
     return Ok(());
