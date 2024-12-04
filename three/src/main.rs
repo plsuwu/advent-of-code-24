@@ -4,13 +4,20 @@ use std::{error::Error, str::Chars};
 struct Parser<'a> {
     chars: Chars<'a>,
     curr: Option<char>,
+    switch: bool,
 }
 
 impl<'a> Parser<'a> {
     fn new(input: &'a str) -> Self {
         let mut chars = input.chars();
         let curr = chars.next();
-        return Parser { chars, curr };
+        let switch = true;
+
+        return Parser {
+            chars,
+            curr,
+            switch,
+        };
     }
 
     fn seek_next(&mut self) {
@@ -73,6 +80,12 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_op(&mut self) -> Option<u32> {
+        if self.match_token("do()") {
+            self.switch = true;
+        } else if self.match_token("don't()") {
+            self.switch = false;
+        }
+
         if !self.match_token("mul(") {
             return None;
         }
@@ -91,6 +104,10 @@ impl<'a> Parser<'a> {
         self.consume();
         if !self.match_token(")") {
             return None;
+        }
+
+        if !self.switch {
+            return Some(0);
         }
 
         return Some(x * y);
