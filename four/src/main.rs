@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::error::Error;
 
 const DIRS: [(i32, i32); 8] = [
@@ -12,11 +13,7 @@ const DIRS: [(i32, i32); 8] = [
 ];
 
 fn is_valid(ix: i32, jx: i32, grid: &Vec<Vec<i32>>, prev: i32) -> bool {
-    let bounded =
-            ix >= 0
-         && jx >= 0
-         && ix < grid.len() as i32
-         && jx < grid[0].len() as i32;
+    let bounded = ix >= 0 && jx >= 0 && ix < grid.len() as i32 && jx < grid[0].len() as i32;
 
     if !bounded {
         return false;
@@ -47,7 +44,6 @@ fn counter(grid: &Vec<Vec<i32>>) -> usize {
                     }
 
                     let curr = grid[ix as usize][jx as usize];
-
                     prev = curr;
                 }
 
@@ -61,8 +57,53 @@ fn counter(grid: &Vec<Vec<i32>>) -> usize {
     return count;
 }
 
+fn x_counter(grid: &Vec<Vec<i32>>) -> i32 {
+    let mut count = 0;
+
+    for i in 0..grid.len() {
+        for j in 0..grid[i].len() {
+            if
+                i + 2 < grid.len()
+                && j + 2 < grid[i].len()
+                && grid[i + 1][j + 1] == 2
+            {
+                // [n, _, _]
+                // [_, n, _]
+                // [_, _, n]
+                let a = format!(
+                    "{}2{}",
+
+                    grid[i][j],
+                    grid[i + 2][j + 2]
+                )
+                .parse::<i32>()
+                .unwrap();
+
+                // [_, _, n]
+                // [_, n, _]
+                // [n, _, _]
+                let b = format!(
+                    "{}2{}",
+
+                    grid[i][j + 2],
+                    grid[i + 2][j]
+                )
+                .parse::<i32>()
+                .unwrap();
+
+                if (a == 123 || a == 321) && (b == 123 || b == 321) {
+                    count += 1
+                }
+            }
+        }
+    }
+
+    return count;
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let input = std::fs::read_to_string("./src/input.txt")?;
+
     let grid: Vec<Vec<i32>> = input
         .lines()
         .map(|line| {
@@ -80,8 +121,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         })
         .collect();
 
-    let res = counter(&grid);
-    println!("xmas appears '{}' times", res);
+    let res_1 = counter(&grid);
+    println!("part one: '{}'", res_1);
+
+    let res_2 = x_counter(&grid);
+    println!("part two: '{}'", res_2);
 
     return Ok(());
 }
