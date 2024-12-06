@@ -1,26 +1,31 @@
-#![allow(dead_code)]
 use std::error::Error;
 
 const DIRS: [(i32, i32); 8] = [
-    (0, 1),
-    (0, -1),
-    (1, 0),
-    (-1, 0),
-    (1, 1),
-    (-1, -1),
-    (1, -1),
-    (-1, 1),
+    (0, 1),     // [c, n]
+
+    (0, -1),    // [n, c]
+
+    (1, 0),     // [n, _],
+                // [c, _]
+
+    (-1, 0),    // [c, _],
+                // [n, _]
+
+    (1, 1),     // [_, n],
+                // [c, _],
+
+    (-1, -1),   // [_, c],
+                // [n, _],
+
+    (1, -1),    // [n, _]
+                // [_, c]
+
+    (-1, 1),    // [c, _],
+                // [_, n]
 ];
 
-fn is_valid(ix: i32, jx: i32, grid: &Vec<Vec<i32>>, prev: i32) -> bool {
-    let bounded = ix >= 0 && jx >= 0 && ix < grid.len() as i32 && jx < grid[0].len() as i32;
-
-    if !bounded {
-        return false;
-    }
-
-    let curr = grid[ix as usize][jx as usize];
-    return bounded && curr == prev + 1;
+fn is_valid(ix: i32, jx: i32, grid: &Vec<Vec<i32>>) -> bool {
+    return ix >= 0 && jx >= 0 && ix < grid.len() as i32 && jx < grid[0].len() as i32;
 }
 
 fn counter(grid: &Vec<Vec<i32>>) -> usize {
@@ -38,7 +43,10 @@ fn counter(grid: &Vec<Vec<i32>>) -> usize {
                     let ix = i as i32 + dx * k as i32;
                     let jx = j as i32 + dy * k as i32;
 
-                    if !is_valid(ix, jx, grid, prev) {
+                    if
+                        !is_valid(ix, jx, grid)
+                        || grid[ix as usize][jx as usize] != prev + 1
+                    {
                         valid = false;
                         break;
                     }
@@ -63,35 +71,37 @@ fn x_counter(grid: &Vec<Vec<i32>>) -> i32 {
     for i in 0..grid.len() {
         for j in 0..grid[i].len() {
             if
-                i + 2 < grid.len()
-                && j + 2 < grid[i].len()
-                && grid[i + 1][j + 1] == 2
+                is_valid(
+                    (i + 2).try_into().unwrap(),
+                    (j + 2).try_into().unwrap(),
+                    grid
+                )
             {
-                // [n, _, _]
-                // [_, n, _]
-                // [_, _, n]
+
+                // [x, _, _]
+                // [_, y, _]
+                // [_, _, z]
                 let a = format!(
-                    "{}2{}",
-
+                    "{}{}{}",
                     grid[i][j],
+                    grid[i + 1][j + 1],
                     grid[i + 2][j + 2]
-                )
-                .parse::<i32>()
-                .unwrap();
+                );
 
-                // [_, _, n]
-                // [_, n, _]
-                // [n, _, _]
+                // [_, _, x]
+                // [_, y, _]
+                // [z, _, _]
                 let b = format!(
-                    "{}2{}",
-
+                    "{}{}{}",
                     grid[i][j + 2],
+                    grid[i + 1][j + 1],
                     grid[i + 2][j]
-                )
-                .parse::<i32>()
-                .unwrap();
+                );
 
-                if (a == 123 || a == 321) && (b == 123 || b == 321) {
+                if
+                    (&a == "123" || &a == "321")
+                    && (&b == "123" || &b == "321")
+                {
                     count += 1
                 }
             }
